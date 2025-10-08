@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Certificate Generator (A4 Portrait)</title>
+  <title>Certificate Generator (A4 Landscape)</title>
 
   <!-- Hindi-friendly font -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700;800&display=swap" rel="stylesheet">
@@ -53,10 +53,11 @@
       margin-top: 30px;
     }
 
+    /* Landscape A4 size */
     .page {
       position: relative;
-      width: 793px;   /* A4 Portrait width */
-      height: 1122px; /* A4 Portrait height */
+      width: 1122px;  /* landscape width */
+      height: 793px;  /* landscape height */
       margin: 0 auto;
       background-image: url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRX2CfVr9aGlWKDfXi-LhMImYy4Q3YRlPgv0bzIGhita5mYn4Nnjy2KMM5aQDqYTqRBvTWmcEct9G3CCWVHzRa06hNb_9xwRlPXNA2Sntq4XSRZ9d5TFECUmylkXWSEJhCraJ13Fa-pl0FeGZ9SUakZ3tKXPFTBJKo8jpiiWO-yT5-qsYZnw2ZCcQ70vg/s16000/A4%20(Landscape)%20(1).jpg");
       background-size: cover;
@@ -67,15 +68,15 @@
 
     .date {
       position: absolute;
-      top: 40px;
-      left: 60px;
-      font-size: 18px;
+      top: 28px;
+      left: 40px;
+      font-size: 14px;
       font-weight: 700;
     }
 
     .name {
       position: absolute;
-      top: 300px;
+      top: 210px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 36px;
@@ -85,9 +86,9 @@
 
     .paragraph {
       position: absolute;
-      top: 380px;
-      left: 100px;
-      width: 600px;
+      top: 270px;
+      left: 140px;
+      width: 840px;
       font-size: 20px;
       line-height: 1.6;
       text-align: justify;
@@ -95,9 +96,9 @@
 
     .footer-note {
       position: absolute;
-      bottom: 80px;
-      left: 100px;
-      font-size: 18px;
+      bottom: 70px;
+      left: 140px;
+      font-size: 16px;
       font-weight: 600;
     }
 
@@ -136,37 +137,29 @@
     <button id="download-btn">Download Certificate</button>
   </div>
 
-  <!-- html2canvas for screenshot -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
   <script>
-    document.getElementById("certForm").addEventListener("submit", function(e) {
+    document.getElementById("certForm").addEventListener("submit", function(e){
       e.preventDefault();
+
       const name = document.getElementById("name").value.trim();
       const father = document.getElementById("fatherName").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
 
       const today = new Date();
       const date = today.toLocaleDateString('en-GB').replace(/\//g, '-'); // DD-MM-YYYY
 
-      const cert = document.getElementById("certificate").outerHTML
-        .replace("{{NAME}}", name)
-        .replace("{{FATHER_OR_HUSBAND_NAME}}", father)
-        .replace("{{DATE}}", date);
+      const certEl = document.getElementById("certificate");
+      certEl.querySelector(".name").textContent = name;
+      certEl.querySelector(".paragraph").innerHTML = certEl.querySelector(".paragraph").innerHTML.replace("{{FATHER_OR_HUSBAND_NAME}}", father);
+      certEl.querySelector(".date").textContent = "Date: " + date;
 
       document.getElementById("certificate-container").style.display = "block";
-      document.getElementById("certificate-container").innerHTML =
-        cert + '<button id="download-btn">Download Certificate</button>';
 
-      document.getElementById("download-btn").addEventListener("click", () => {
-        html2canvas(document.querySelector("#certificate"), {
-          scale: 3, // High quality
-          useCORS: true
-        }).then(canvas => {
+      document.getElementById("download-btn").addEventListener("click", function(){
+        html2canvas(certEl, {scale: 3, useCORS: true}).then(canvas => {
           const link = document.createElement("a");
-          link.download = name.replace(/\s+/g, "_") + "_certificate.jpg";
-          link.href = canvas.toDataURL("image/jpeg", 1.0);
+          link.download = name.replace(/\s+/g,"_") + "_certificate.png";
+          link.href = canvas.toDataURL("image/png");
           link.click();
         });
       });
